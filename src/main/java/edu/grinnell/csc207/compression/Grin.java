@@ -1,5 +1,6 @@
 package edu.grinnell.csc207.compression;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -11,9 +12,14 @@ public class Grin {
      * .grin file denoted by outfile.
      * @param infile the file to decode
      * @param outfile the file to ouptut to
+     * @throws IOException 
      */
-    public static void decode (String infile, String outfile) {
+    public static void decode (String infile, String outfile) throws IOException {
         // TODO: fill me in!
+            BitInputStream input = new BitInputStream(infile);
+            BitOutputStream output = new BitOutputStream(outfile);
+            HuffmanTree huffmanTree = new HuffmanTree(input);
+            huffmanTree.decode(input, output);
     }
 
     /**
@@ -41,9 +47,23 @@ public class Grin {
     /**
      * The entry point to the program.
      * @param args the command-line arguments.
+     * @throws IOException 
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // TODO: fill me in!
         System.out.println("Usage: java Grin <encode|decode> <infile> <outfile>");
+        if(args.length == 3 && (args[0] != "decode" || args[0] != "encode") ){ //or infile is not a valid .grin file (i.e., the magic number is not correct
+            String infile = args[1];
+            String outfile = args[2];
+            if(args[0] == "decode"){
+                decode(infile, outfile);
+            }
+            else if (args[0] == "encode") {
+                encode(infile, outfile);
+            }
+        }
+        else{
+            throw new IllegalArgumentException();
+        }
     }
 }

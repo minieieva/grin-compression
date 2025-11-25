@@ -15,6 +15,22 @@ import java.util.Map;
  * our byte values.
  */
 public class HuffmanTree {
+    private Node root;
+
+    private static class Node{
+        int byteValue;
+        Node left;
+        Node right;
+        int size;
+
+        public Node(int byteValue, Node right, Node left){
+            this.size = -1;
+            //right.size + left.size;
+            this.right = right;
+            this.left = left;
+            this.byteValue = byteValue;
+        }
+    }
 
     /**
      * Constructs a new HuffmanTree from a frequency map.
@@ -23,13 +39,33 @@ public class HuffmanTree {
     public HuffmanTree (Map<Short, Integer> freqs) {
         // TODO: fill me in!
     }
+  
 
+
+    private Node constructHuffmanTreeHelper(BitInputStream in) {
+        int bit = in.readBit();
+        if (bit == 0) {
+            int byteValue = in.readBits(9);
+            return new Node(byteValue, null, null);
+        }
+        else if (bit == 1) {
+            Node left = constructHuffmanTreeHelper(in);
+            Node right = constructHuffmanTreeHelper(in);
+            return new Node(-1, left, right);
+        }
+        else {
+            throw new IllegalArgumentException();
+        }
+    }
     /**
      * Constructs a new HuffmanTree from the given file.
      * @param in the input file (as a BitInputStream)
      */
     public HuffmanTree (BitInputStream in) {
         // TODO: fill me in!
+        //Original file is in a serialized format
+        //Deserialize
+        this.root = constructHuffmanTreeHelper(in);
     }
 
     /**
@@ -37,8 +73,9 @@ public class HuffmanTree {
      * serialized format.
      * @param out the output file as a BitOutputStream
      */
-    public void serialize (BitOutputStream out) {
+    public static void serialize (BitOutputStream out) {
         // TODO: fill me in!
+        //2)
     }
    
     /**
@@ -60,7 +97,9 @@ public class HuffmanTree {
      * @param in the file to decompress.
      * @param out the file to write the decompressed output to.
      */
-    public void decode (BitInputStream in, BitOutputStream out) {
+    public static void decode (BitInputStream in, BitOutputStream out) {
         // TODO: fill me in!
+        // Constructs a HuffmanTree from the serialized version of the tree
+        HuffmanTree huffTree = new HuffmanTree(in);
     }
 }
