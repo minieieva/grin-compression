@@ -53,7 +53,7 @@ public class HuffmanTree {
         else {
             Node left = constructHuffmanTreeHelper(in);
             Node right = constructHuffmanTreeHelper(in);
-            return new Node(-1, left, right);
+            return new Node(-1, right, left);
         }
     }
     /**
@@ -96,14 +96,14 @@ public class HuffmanTree {
      * @param in the file to decompress.
      * @param out the file to write the decompressed output to.
      */
-    public static void decode (BitInputStream in, BitOutputStream out) {
+    public void decode (BitInputStream in, BitOutputStream out) {
         // TODO: fill me in!
         // Constructs a HuffmanTree from the serialized version of the tree
-        HuffmanTree huffTree = new HuffmanTree(in);
         //At this point I have a huffTree
-        Node current = huffTree.root;
+        Node current = this.root;
         while(true){
             int bit = in.readBit();
+            if (bit == -1) return;
             if(bit == 0){
                 current = current.left;
             }
@@ -116,8 +116,8 @@ public class HuffmanTree {
                     return;
                 }
                 out.writeBits(current.byteValue, 8);
+                current = this.root;
             }
-            current = huffTree.root;
         }
     }
 }

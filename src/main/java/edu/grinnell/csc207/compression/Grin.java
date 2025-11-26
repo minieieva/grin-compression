@@ -18,12 +18,15 @@ public class Grin {
         // TODO: fill me in!
             BitInputStream input = new BitInputStream(infile);
             BitOutputStream output = new BitOutputStream(outfile);
-            if(input.readBits(32)!= 1846){
-                System.out.println("Not a .grin file");
-                return;
+            if(input.readBits(32)== 1846){
+                HuffmanTree huffmanTree = new HuffmanTree(input);
+                huffmanTree.decode(input, output);
             }
-            HuffmanTree huffmanTree = new HuffmanTree(input);
-            huffmanTree.decode(input, output);
+            else{
+                System.out.println("Not a .grin file");
+            }
+            input.close();
+            output.close();
     }
 
     /**
@@ -55,14 +58,20 @@ public class Grin {
      */
     public static void main(String[] args) throws IOException {
         // TODO: fill me in!
-        System.out.println("Usage: java Grin <encode|decode> <infile> <outfile>");
-        if(args.length == 3 && (args[0] != "decode" || args[0] != "encode")){ //or infile is not a valid .grin file (i.e., the magic number is not correct
+        //System.out.println("Usage: java Grin <encode|decode> <infile> <outfile>");
+        System.out.println("Args length = " + args.length);
+for (int i = 0; i < args.length; i++) {
+    System.out.println("args[" + i + "] = '" + args[i] + "'");
+}
+        if(args.length == 3 && (args[0].equals("decode")|| args[0].equals("encode"))){ //or infile is not a valid .grin file (i.e., the magic number is not correct
             String infile = args[1];
             String outfile = args[2];
-            if(args[0] == "decode"){
+            System.out.println("Inside");
+            if(args[0].equals("decode")){
                 decode(infile, outfile);
+                System.out.println("Decoded successfully");
             }
-            else if (args[0] == "encode") {
+            else if (args[0].equals("encode")) {
                 encode(infile, outfile);
             }
         }
