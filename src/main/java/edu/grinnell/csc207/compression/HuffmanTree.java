@@ -39,22 +39,21 @@ public class HuffmanTree {
     public HuffmanTree (Map<Short, Integer> freqs) {
         // TODO: fill me in!
     }
-  
 
-
+    /**
+     * Deserialized the input and adds values into Huffman tree
+     * @param in the input file (as a BitInputStream)
+     * @return the root node for Huffman tree
+     */
     private Node constructHuffmanTreeHelper(BitInputStream in) {
-        int bit = in.readBit();
-        if (bit == 0) {
+        if (in.readBit() == 0) {
             int byteValue = in.readBits(9);
             return new Node(byteValue, null, null);
         }
-        else if (bit == 1) {
+        else {
             Node left = constructHuffmanTreeHelper(in);
             Node right = constructHuffmanTreeHelper(in);
             return new Node(-1, left, right);
-        }
-        else {
-            throw new IllegalArgumentException();
         }
     }
     /**
@@ -101,5 +100,24 @@ public class HuffmanTree {
         // TODO: fill me in!
         // Constructs a HuffmanTree from the serialized version of the tree
         HuffmanTree huffTree = new HuffmanTree(in);
+        //At this point I have a huffTree
+        Node current = huffTree.root;
+        while(true){
+            int bit = in.readBit();
+            if(bit == 0){
+                current = current.left;
+            }
+            else if(bit == 1){
+                current = current.right;
+            }
+            if(current.left == null && current.right == null){
+                int value = current.byteValue;
+                if (value == 256) {
+                    return;
+                }
+                out.writeBits(current.byteValue, 8);
+            }
+            current = huffTree.root;
+        }
     }
 }

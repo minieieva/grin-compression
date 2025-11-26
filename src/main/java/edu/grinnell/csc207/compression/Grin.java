@@ -18,6 +18,10 @@ public class Grin {
         // TODO: fill me in!
             BitInputStream input = new BitInputStream(infile);
             BitOutputStream output = new BitOutputStream(outfile);
+            if(input.readBits(32)!= 1846){
+                System.out.println("Not a .grin file");
+                return;
+            }
             HuffmanTree huffmanTree = new HuffmanTree(input);
             huffmanTree.decode(input, output);
     }
@@ -52,7 +56,7 @@ public class Grin {
     public static void main(String[] args) throws IOException {
         // TODO: fill me in!
         System.out.println("Usage: java Grin <encode|decode> <infile> <outfile>");
-        if(args.length == 3 && (args[0] != "decode" || args[0] != "encode") ){ //or infile is not a valid .grin file (i.e., the magic number is not correct
+        if(args.length == 3 && (args[0] != "decode" || args[0] != "encode")){ //or infile is not a valid .grin file (i.e., the magic number is not correct
             String infile = args[1];
             String outfile = args[2];
             if(args[0] == "decode"){
