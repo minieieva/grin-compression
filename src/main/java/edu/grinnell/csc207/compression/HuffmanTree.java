@@ -1,6 +1,10 @@
 package edu.grinnell.csc207.compression;
 
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.PriorityQueue;
 
 /**
  * A HuffmanTree derives a space-efficient coding of a collection of byte
@@ -23,8 +27,16 @@ public class HuffmanTree {
         Node right;
         int size;
 
-        public Node(int byteValue, Node right, Node left){
+        public Node(int byteValue, Node left, Node right){
             this.size = -1;
+            //right.size + left.size;
+            this.right = right;
+            this.left = left;
+            this.byteValue = byteValue;
+        }
+
+        public Node(int byteValue, int size, Node right, Node left){
+            this.size = size;
             //right.size + left.size;
             this.right = right;
             this.left = left;
@@ -38,6 +50,22 @@ public class HuffmanTree {
      */
     public HuffmanTree (Map<Short, Integer> freqs) {
         // TODO: fill me in!
+        //Construct priority queue
+        PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(leafOrInternalNode -> leafOrInternalNode.size));
+        for(Entry<Short, Integer> entry : freqs.entrySet()){
+            Node leaf = new Node(entry.getKey(), entry.getValue(), null, null);
+            queue.add(leaf);
+        }
+
+        //build a Huffman tree
+        while(queue.size()>=2){
+            Node top = queue.poll();
+            Node second = queue.poll();
+            int sizeCompined = top.size + second.size;
+            Node internal = new Node(-1, sizeCompined, top, second);
+            queue.add(internal);
+        }
+        this.root = queue.poll();
     }
 
     /**
@@ -53,7 +81,7 @@ public class HuffmanTree {
         else {
             Node left = constructHuffmanTreeHelper(in);
             Node right = constructHuffmanTreeHelper(in);
-            return new Node(-1, right, left);
+            return new Node(-1, left, right);
         }
     }
     /**
@@ -70,13 +98,73 @@ public class HuffmanTree {
     /**
      * Writes this HuffmanTree to the given file as a stream of bits in a
      * serialized format.
+     * @param current the current node in a tree
      * @param out the output file as a BitOutputStream
      */
-    public static void serialize (BitOutputStream out) {
+    public void serializeHelper(Node current, BitOutputStream out){
+        if(current.left == null && current.right == null){
+                out.writeBit(0);
+                out.writeBits(current.byteValue, 9);
+            }
+            else {
+                out.writeBit(1);
+                serializeHelper(current.left, out);
+                serializeHelper(current.right, out);
+            }
+    }
+
+    /**
+     * Writes this HuffmanTree to the given file as a stream of bits in a
+     * serialized format.
+     * @param out the output file as a BitOutputStream
+     */
+    public void serialize (BitOutputStream out) {
         // TODO: fill me in!
-        //2)
+            serializeHelper(this.root, out);
     }
    
+
+    /**
+     * Generates codes for each byte value in the Huffman tree
+     * @param current the current node in a tree
+     * @param codes a map from byte values to their codes
+     * @param code the current code
+     */
+    public void getCodes(Node current, Map<Integer, String> codes, String code){
+        if(current.left == null && current.right == null){
+            codes.put(current.byteValue, code);
+            return;
+        }
+        getCodes(current.left, codes, code + "0");
+        getCodes(current.right, codes, code + "1");
+    }
+
+
+    /**
+     * Writes the payload (the encoded bits) to the output stream.
+     * @param in the input file
+     * @param out the output file
+     */
+    public void writePayload(BitInputStream in, BitOutputStream out){
+        Map<Integer, String> codes = new HashMap<>();
+        getCodes(this.root, codes, "");
+
+        while(true){
+            int character = in.readBits(8);
+            if (character == -1){
+                break;
+            }
+            String getBits = codes.get(character);
+            for(char ch : getBits.toCharArray()){
+                if (ch == '1') {
+                    out.writeBit(1);
+                } else {
+                    out.writeBit(0);
+                }
+            }
+        }
+    }
+
     /**
      * Encodes the file given as a stream of bits into a compressed format
      * using this Huffman tree. The encoded values are written, bit-by-bit
@@ -86,6 +174,9 @@ public class HuffmanTree {
      */
     public void encode (BitInputStream in, BitOutputStream out) {
         // TODO: fill me in!
+        out.writeBits(1846, 32);
+        serialize(out);
+        writePayload(in, out);
     }
 
     /**
@@ -99,11 +190,9 @@ public class HuffmanTree {
     public void decode (BitInputStream in, BitOutputStream out) {
         // TODO: fill me in!
         // Constructs a HuffmanTree from the serialized version of the tree
-        //At this point I have a huffTree
         Node current = this.root;
         while(true){
             int bit = in.readBit();
-            if (bit == -1) return;
             if(bit == 0){
                 current = current.left;
             }
@@ -113,7 +202,7 @@ public class HuffmanTree {
             if(current.left == null && current.right == null){
                 int value = current.byteValue;
                 if (value == 256) {
-                    return;
+                    break;
                 }
                 out.writeBits(current.byteValue, 8);
                 current = this.root;

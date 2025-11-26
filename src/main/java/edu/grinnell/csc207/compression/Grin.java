@@ -1,6 +1,7 @@
 package edu.grinnell.csc207.compression;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,10 +36,28 @@ public class Grin {
      * BitInputStream, consuming 8 bits at a time.
      * @param file the file to read
      * @return a freqency map for the given file
+     * @throws IOException 
      */
-    public static Map<Short, Integer> createFrequencyMap (String file) {
+    public static Map<Short, Integer> createFrequencyMap (String file) throws IOException {
         // TODO: fill me in!
-        return null;
+        BitInputStream input = new BitInputStream(file);
+        Map<Short, Integer> frequencyMap = new HashMap<>();
+        while(true){
+            int bits = input.readBits(8);
+            if(bits == -1){
+                break;
+            }
+            short key = (short) bits;
+            if(frequencyMap.containsKey(key)){
+                frequencyMap.put(key, frequencyMap.get(key) + 1);
+            }
+            else{
+                    frequencyMap.put(key, 1);
+            }
+        }   
+        frequencyMap.put((short)256, 1);
+        input.close();
+        return frequencyMap;
     }
 
     /**
@@ -46,9 +65,17 @@ public class Grin {
      * .grin file denoted by outfile.
      * @param infile the file to encode.
      * @param outfile the file to write the output to.
+     * @throws IOException 
      */
-    public static void encode(String infile, String outfile) {
+    public static void encode(String infile, String outfile) throws IOException {
         // TODO: fill me in!
+            Map<Short, Integer> frequencyMap = createFrequencyMap(infile);
+            BitInputStream input = new BitInputStream(infile);
+            BitOutputStream output = new BitOutputStream(outfile);
+            HuffmanTree huffmanTree = new HuffmanTree(frequencyMap);
+            huffmanTree.encode(input, output);
+            input.close();
+            output.close();
     }
 
     /**
@@ -73,6 +100,7 @@ for (int i = 0; i < args.length; i++) {
             }
             else if (args[0].equals("encode")) {
                 encode(infile, outfile);
+                System.out.println("Encoded successfully");
             }
         }
         else{

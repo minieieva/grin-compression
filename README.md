@@ -1,13 +1,18 @@
 # Project: Grin Compression
 
-Authors: (_TODO: fill in names here!_)
+Authors: Mariia Minieieva
 
 ## Resources
 
-*   (_TODO: fill in resources here!_)
-*   ...
-*   ...
+*   [PriorityQueue](https://docs.oracle.com/javase/8/docs/api/java/util/PriorityQueue.html)
+*   [HashMap](https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html)
+*   [Lab 8 Lists]
+*   [Hashing Reading] (https://osera.cs.grinnell.edu/ttap/data-structures/hashing.html)
+*   [Iterate over a Map in Java] (https://www.baeldung.com/java-iterate-map)
 
 ## Revision Log
 
-*   (_TODO: fill in your changes to your project here!_)
+*   Started decode
+    Decode finish before testing
+    Decode now working after fixes
+    All finished
