@@ -16,7 +16,6 @@ public class Grin {
      * @throws IOException 
      */
     public static void decode (String infile, String outfile) throws IOException {
-        // TODO: fill me in!
             BitInputStream input = new BitInputStream(infile);
             BitOutputStream output = new BitOutputStream(outfile);
             if(input.readBits(32)== 1846){
@@ -39,7 +38,6 @@ public class Grin {
      * @throws IOException 
      */
     public static Map<Short, Integer> createFrequencyMap (String file) throws IOException {
-        // TODO: fill me in!
         BitInputStream input = new BitInputStream(file);
         Map<Short, Integer> frequencyMap = new HashMap<>();
         while(true){
@@ -68,7 +66,6 @@ public class Grin {
      * @throws IOException 
      */
     public static void encode(String infile, String outfile) throws IOException {
-        // TODO: fill me in!
             Map<Short, Integer> frequencyMap = createFrequencyMap(infile);
             BitInputStream input = new BitInputStream(infile);
             BitOutputStream output = new BitOutputStream(outfile);
@@ -104,7 +101,8 @@ for (int i = 0; i < args.length; i++) {
             }
         }
         else{
-            throw new IllegalArgumentException();
+            System.out.println("Usage: java Grin <encode|decode> <infile> <outfile>");
+            return;
         }
     }
 }
