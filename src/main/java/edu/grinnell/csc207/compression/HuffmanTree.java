@@ -49,7 +49,8 @@ public class HuffmanTree {
      * @param freqs a map from 9-bit values to frequencies.
      */
     public HuffmanTree (Map<Short, Integer> freqs) {
-        // TODO: fill me in!
+        freqs.put((short) 256, 1);
+        
         //Construct priority queue
         PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(leafOrInternalNode -> leafOrInternalNode.size));
         for(Entry<Short, Integer> entry : freqs.entrySet()){
@@ -163,6 +164,14 @@ public class HuffmanTree {
                 }
             }
         }
+        String eofBits = codes.get(256);
+        for(char ch : eofBits.toCharArray()){
+            if (ch == '1') {
+                out.writeBit(1);
+            } else {
+                out.writeBit(0);
+            }
+        }
     }
 
     /**
@@ -173,7 +182,6 @@ public class HuffmanTree {
      * @param out the file to write the compressed output to.
      */
     public void encode (BitInputStream in, BitOutputStream out) {
-        // TODO: fill me in!
         out.writeBits(1846, 32);
         serialize(out);
         writePayload(in, out);
